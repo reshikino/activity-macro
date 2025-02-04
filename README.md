@@ -21,11 +21,7 @@ To install **Activity Macro**, follow these steps:
      ```
      https://github.com/reshikino/activity-macro/releases/latest/download/module.json
      ```
-   
-   - **For a specific version (e.g., v1.0.0)**:
-     ```
-     https://github.com/reshikino/activity-macro/releases/download/v1.0.0/module.json
-     ```
+
 
 5. Click **Install** to download and install the module.
 
@@ -45,10 +41,6 @@ Once the module is installed and activated, follow these steps to configure macr
 
 Let's say you have an item with an activity called "Swing Sword." You can assign a macro that will be executed whenever this activity is triggered, such as a damage roll or special effect.
 
-## Changelog
-
-### v1.0.0
-- Initial release.
 
 ## License
 
@@ -56,4 +48,9 @@ This module is licensed under the MIT License. See [LICENSE](LICENSE) for more i
 
 ## Authors
 
-- **reshikino** (GitHub: [reshikino#5514](https://github.com/reshikino))
+## Authors
+
+- **reshikino**  
+  - GitHub: [reshikino](https://github.com/reshikino)  
+  - Discord: [reshikino#5514](https://discord.com/users/reshikino#5514)
+
