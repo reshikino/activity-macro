@@ -36,7 +36,7 @@ Once the module is installed and activated, follow these steps to configure macr
 3. You will see a list of available activities. For each activity, you can assign a macro.
 4. Type in the name of the macro or use the search field to find the desired macro.
 5. Save the changes and trigger the macros when the respective activity is used.
-
+IMPORTANT: Make sure that the macro is accessible to the player. If the player does not have permission to access the macro, it will not be able to trigger the assigned macro during the activity.
 ## Example
 
 Let's say you have an item with an activity called "Swing Sword." You can assign a macro that will be executed whenever this activity is triggered, such as a damage roll or special effect.
