@@ -1,0 +1,86 @@
+.am-form-header {
+    font-size: 1.1em;
+    margin-bottom: 1em;
+    color: #4A90E2;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+    font-weight: normal;
+}
+
+.am-activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25em;
+    padding: 0 1em;
+}
+
+.am-activity-card {
+    background: transparent;
+    border: 1px solid #9f9275;
+    border-radius: 4px;
+    padding: 1em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.am-activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.am-activity-name {
+    font-weight: 600;
+    font-size: 1.3em;
+    color: #fff;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    flex-grow: 1;
+}
+
+.am-activity-name[title]::after {
+    content: " (ID: " attr(title) ")";
+    font-size: 0.55em;
+    color: #bbb;
+}
+
+.am-activity-macro-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1em;
+}
+
+.am-activity-macro-container input[type="text"] {
+    width: 150px;
+    padding: 0.5em;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9em;
+    background-color: transparent;
+    color: #444;
+    transition: none;
+    margin-right: 1em;
+}
+
+.am-activity-macro-container input[type="text"]:focus {
+    border-color: #4A90E2;
+    outline: none;
+}
+
+.am-no-activities {
+    font-size: 1em;
+    color: #888;
+    font-style: italic;
+    text-align: center;
+}
+.save-button {
+    width: auto; 
+    padding: 0.3em 0.6em; 
+    font-size: 0.9em; 
+    min-width: 30px; 
+    text-align: center; 
+}

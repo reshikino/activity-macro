@@ -1,0 +1,28 @@
+  {{#if activities.length}}
+    <div class="am-activity-list">
+      {{#each activities as |activity|}}
+        <div class="am-activity-card">
+          <div class="am-activity-header">
+            <div class="am-activity-name" title="{{activity.activityId}}">
+              {{activity.name}} 
+            </div>
+          </div>
+
+          <div class="am-activity-macro-container">
+            <input type="text" id="macro-search-{{activity.activityId}}" list="activitymacrolist-{{activity.activityId}}" placeholder="{{localize 'activity-macro.search.placeholder'}}" value="{{activity.macroSearchValue}}">
+            <datalist id="activitymacrolist-{{activity.activityId}}">
+              {{#each activity.macros as |macro|}} 
+                <option value="{{macro.name}}" data-id="{{macro.id}}">{{macro.name}} (Macro ID: {{macro.id}})</option>
+              {{/each}}
+            </datalist>
+
+            <button class="save-button" data-activity-id="{{activity.activityId}}">
+              <i class="fas fa-check"></i>
+            </button>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  {{else}}
+    <p class="am-no-activities">{{localize "activity-macro.activities.none"}}</p>
+  {{/if}}

@@ -1,0 +1,15 @@
+{
+  "activity-macro": {
+    "search": {
+      "placeholder": "Пусто"
+    },
+    "tabs": {
+      "AMtab": "Макросы"
+    },
+    "templateLoadError": "Ошибка загрузки шаблона",
+    "macroInputError": "Не удалось найти поле ввода для активности с ID: {activityId}",
+    "saveError": "Ошибка при сохранении данных",
+    "noActivitiesWarning": "У предмета \"{itemName}\" нет активностей.",
+    "dataSaved": "Данные для активности \"{activityName}\" сохранены."
+  }
+}
