@@ -15,10 +15,7 @@ function renderItemSheetHook(app, [elem]) {
   const item = app.object;
   const activities = item.system.activities?.contents || [];
 
-  if (!activities.length) {
-    ui.notifications.warn(game.i18n.localize("activity-macro.noActivitiesWarning"));
-    return;
-  }
+
 
   const macros = game.macros.contents.map(macro => ({
     id: macro.id,
