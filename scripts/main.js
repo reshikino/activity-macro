@@ -119,7 +119,10 @@ function executeMacroForActivity(activity) {
           if (macroId) {
             const macro = game.macros.get(macroId);
             if (macro) {
-              macro.execute({activity: activity});
+              macro.execute({
+                activity: activity,
+                item: activity.item
+              });
             }
           }
           return;
