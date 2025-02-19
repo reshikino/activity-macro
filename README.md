@@ -46,6 +46,15 @@ IMPORTANT: Make sure that the macro is accessible to the player. If the player d
 Let's say you have an item with an activity called "Swing Sword." You can assign a macro that will be executed whenever this activity is triggered, such as a damage roll or special effect.
 
 
+## Arguments
+
+When writing a macro to be executed with an activity, you will have access to the following arguments:
+- `activity`: The activity object that triggers this macro
+- `item`: The item object that holds the activity
+- `concentration`: The concentration config, in case you need the concentration ID for anything
+- `results`: An object with varied data that are a result of using the activity, such as created templates, or the chat message.
+
+
 ## License
 
 This module is licensed under the MIT License. See [LICENSE](LICENSE) for more information.
