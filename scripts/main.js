@@ -106,7 +106,7 @@ function renderItemSheetHook(app, [elem]) {
 
 Hooks.on("renderItemSheet", renderItemSheetHook);
 
-function executeMacroForActivity(activity) {
+function executeMacroForActivity(activity, config, results) {
   if (activity.item && activity.item.flags && activity.item.flags["activity-macro"]) {
     const amMacroFlags = activity.item.flags["activity-macro"];
     
@@ -121,7 +121,9 @@ function executeMacroForActivity(activity) {
             if (macro) {
               macro.execute({
                 activity: activity,
-                item: activity.item
+                item: activity.item,
+				        concentration: config.concentration,
+				        results: results
               });
             }
           }
