@@ -14,9 +14,6 @@ function renderItemSheetHook(app, [elem]) {
 
   const item = app.object;
   const activities = item.system.activities?.contents || [];
-
-
-
   const macros = game.macros.contents.map(macro => ({
     id: macro.id,
     name: macro.name
@@ -104,26 +101,36 @@ function renderItemSheetHook(app, [elem]) {
   });
 }
 
+
 Hooks.on("renderItemSheet", renderItemSheetHook);
 
 function executeMacroForActivity(activity, config, results) {
   if (activity.item && activity.item.flags && activity.item.flags["activity-macro"]) {
     const amMacroFlags = activity.item.flags["activity-macro"];
-    
+
     for (const key in amMacroFlags) {
       if (amMacroFlags.hasOwnProperty(key)) {
         const flag = amMacroFlags[key];
-        
+
         if (flag.amactivityId === activity.id) {
           const macroId = flag.macroId;
           if (macroId) {
             const macro = game.macros.get(macroId);
             if (macro) {
+              const actor = activity.actor || activity.item.actor;
+              let token = null;
+              if (actor) {
+                token = actor.getActiveTokens()[0];
+              }
+
+              //Nysterian request
               macro.execute({
                 activity: activity,
                 item: activity.item,
-				        concentration: config.concentration,
-				        results: results
+                results: results,
+                concentration: config.concentration,
+                actor: actor,
+                token: token
               });
             }
           }
