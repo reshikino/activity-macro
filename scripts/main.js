@@ -1,108 +1,101 @@
-function renderItemSheetHook(app, [elem]) {
-  const nav = elem.querySelector('.sheet-navigation.tabs');
-  const sheetBody = elem.querySelector('.sheet-body');
+async function renderItemSheetHookV2(app, element) {
+  if (app.constructor.name !== "ItemSheet5e") return;
+
+  const nav = element.querySelector("nav.sheet-tabs.tabs");
+  const sheetBody = element.querySelector("section.window-content");
   if (!nav || !sheetBody) return;
 
-  if (nav.querySelector('a[data-tab="AMtab"]')) return;
+  if (!document.getElementById("amtab-hide-after-style")) {
+    const style = document.createElement("style");
+    style.id = "amtab-hide-after-style";
+    style.textContent = `
+      button[data-action="addDocument"].hide-after::after {
+        display: none !important;
+      }
+    `;
+    document.head.append(style);
+  }
 
-  const amTab = document.createElement('a');
-  amTab.classList.add('item');
-  amTab.setAttribute('data-tab', 'AMtab');
+  nav.querySelectorAll('a[data-tab="AMtab"]').forEach(el => el.remove());
+  sheetBody
+    .querySelectorAll('section.tab[data-tab="AMtab"]')
+    .forEach(el => el.remove());
+
+  const createBtn = sheetBody.querySelector('button[data-action="addDocument"]');
+
+  const amTab = document.createElement("a");
+  amTab.dataset.action = "tab";
+  amTab.dataset.group = "primary";
+  amTab.dataset.tab = "AMtab";
   amTab.innerHTML = `<span>${game.i18n.localize("activity-macro.tabs.AMtab")}</span>`;
-
   nav.appendChild(amTab);
 
-  const item = app.object;
+  nav.addEventListener("click", async event => {
+    const link = event.target.closest('a[data-action="tab"]');
+    if (!link) return;
+    if (createBtn) createBtn.classList.toggle("hide-after", link.dataset.tab === "AMtab");
+    await app.document.setFlag("activity-macro", "lastTab", link.dataset.tab);
+  });
+
+  const item = app.document;
   const activities = item.system.activities?.contents || [];
-  const macros = game.macros.contents.map(macro => ({
-    id: macro.id,
-    name: macro.name
+  const macros = game.macros.contents.map(m => ({ id: m.id, name: m.name }));
+
+  const savedFlags = await Promise.all(
+    activities.map(a => item.getFlag("activity-macro", a.id))
+  );
+
+  const activitiesWithMacros = activities.map((a, i) => ({
+    ...a,
+    activityId: a.id,
+    macros,
+    macroSearchValue: savedFlags[i]?.macroName || ""
   }));
 
-  const activitiesWithMacros = activities.map(activity => ({
-    ...activity,
-    activityId: activity.id,
-    macros: macros
-  }));
+  const html = await foundry.applications.handlebars.renderTemplate(
+    "modules/activity-macro/templates/amtab-template.hbs",
+    { activities: activitiesWithMacros, macros }
+  );
 
-  renderTemplate('modules/activity-macro/templates/amtab-template.hbs', {
-    activities: activitiesWithMacros,
-    macros: macros
-  }).then(html => {
-    const amTabContent = document.createElement('div');
-    amTabContent.classList.add('tab', 'AMtab');
-    amTabContent.setAttribute('data-group', 'primary');
-    amTabContent.setAttribute('data-tab', 'AMtab');
-    amTabContent.innerHTML = html;
+  const amTabContent = document.createElement("section");
+  const tabKey = amTab.dataset.tab.toLowerCase();
+  amTabContent.classList.add(tabKey, "tab");
+  amTabContent.dataset.group = "primary";
+  amTabContent.dataset.tab = amTab.dataset.tab;
+  amTabContent.innerHTML = html;
 
-    sheetBody.appendChild(amTabContent);
+  if (createBtn) sheetBody.insertBefore(amTabContent, createBtn);
+  else sheetBody.appendChild(amTabContent);
 
-    amTab.onclick = (event) => {
-      event.preventDefault();
+  const lastTab = await item.getFlag("activity-macro", "lastTab");
+  if (lastTab === "AMtab") {
+    app.changeTab("AMtab", "primary", { force: true, updatePosition: false });
+  }
 
-      const tabs = nav.querySelectorAll('.item');
-      tabs.forEach(tab => tab.classList.remove('active'));
-
-      amTab.classList.add('active');
-
-      const tabContents = sheetBody.querySelectorAll('.tab');
-      tabContents.forEach(content => content.classList.remove('active'));
-
-      amTabContent.classList.add('active');
-    };
-
-    amTabContent.querySelectorAll('.save-button').forEach(button => {
-      button.addEventListener('click', async (e) => {
-        const activityId = e.target.getAttribute('data-activity-id');
-        const activity = activities.find(a => a.id === activityId);
-
-        if (!activity) return;
-
-        const input = amTabContent.querySelector(`#macro-search-${activityId}`);
-
-        if (!input) {
-          ui.notifications.error(game.i18n.localize("activity-macro.macroInputError"));
-          return;
-        }
-
-        const macroSearchValue = input.value.trim();
-
-        const macro = macros.find(m => m.name === macroSearchValue);
-        const macroId = macro ? macro.id : null;
-        const macroName = macro ? macro.name : null;
-
-        try {
-          await item.update({
-            [`flags.activity-macro.${activityId}`]: {
-              macroId: macroId,   
-              macroName: macroName, 
-              amactivityId: activityId
-            }
-          });
-
-          ui.notifications.info(game.i18n.localize("activity-macro.dataSaved").replace("{activityName}", activity.name));
-        } catch (err) {
-          ui.notifications.error(game.i18n.localize("activity-macro.saveError"));
-        }
+  amTabContent.querySelectorAll(".save-button").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const aid = btn.dataset.activityId;
+      const input = amTabContent.querySelector(`#macro-search-${aid}`);
+      if (!input) return ui.notifications.error(game.i18n.localize("activity-macro.macroInputError"));
+      const name = input.value.trim();
+      const found = macros.find(m => m.name === name);
+      await item.setFlag("activity-macro", aid, {
+        macroId: found?.id ?? null,
+        macroName: found?.name ?? null,
+        amactivityId: aid
       });
+      ui.notifications.info(
+        game.i18n.localize("activity-macro.dataSaved")
+          .replace("{activityName}", activities.find(a => a.id === aid).name)
+      );
     });
-
-    activities.forEach(async (activity) => {
-      const savedData = await item.getFlag('activity-macro', activity.id);
-      if (savedData && savedData.macroId) {
-        const input = amTabContent.querySelector(`#macro-search-${activity.id}`);
-        if (input) {
-          input.value = savedData.macroId;
-        }
-      }
-    });
-  }).catch(err => {
-    ui.notifications.error(game.i18n.localize("activity-macro.templateLoadError"));
   });
 }
 
+Hooks.on("renderApplicationV2", renderItemSheetHookV2);
 
-Hooks.on("renderItemSheet", renderItemSheetHook);
+
+
 
 function executeMacroForActivity(activity, config, results) {
   if (activity.item && activity.item.flags && activity.item.flags["activity-macro"]) {
@@ -142,3 +135,68 @@ function executeMacroForActivity(activity, config, results) {
 }
 
 Hooks.on("dnd5e.postUseActivity", executeMacroForActivity);
+
+
+//tidy sheet register
+Hooks.once("tidy5e-sheet.ready", api => {
+  api.registerItemTab(
+    new api.models.HtmlTab({
+      title: game.i18n.localize("activity-macro.tabs.AMtab"),
+      tabId: "activity-macro-amtab",
+      html: `<div class="activity-macro-tab"></div>`,
+      enabled: () => true,
+      onRender: async ({ tabContentsElement, app }) => {
+        const item       = app.document;
+        const activities = item.system.activities?.contents || [];
+        const macros     = game.macros.contents.map(m => ({ id: m.id, name: m.name }));
+
+        const html = await foundry.applications.handlebars.renderTemplate(
+          "modules/activity-macro/templates/amtab-template.hbs",
+          {
+            activities: activities.map(a => ({
+              ...a,
+              activityId: a.id,
+              macros,
+              macroSearchValue: item.getFlag("activity-macro", a.id)?.macroName || ""
+            })),
+            macros
+          }
+        );
+        tabContentsElement.innerHTML = html;
+
+        tabContentsElement.querySelectorAll(".save-button").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const aid   = btn.dataset.activityId;
+            const input = tabContentsElement.querySelector(`#macro-search-${aid}`);
+            const name  = input.value.trim();
+
+            if (!name) {
+              await item.setFlag("activity-macro", aid, {
+                macroId:      null,
+                macroName:    null,
+                amactivityId: aid
+              });
+              return ui.notifications.info(
+                game.i18n.localize("activity-macro.dataCleared")
+                  .replace("{activityName}", activities.find(a => a.id === aid).name)
+              );
+            }
+
+            const found = macros.find(m => m.name === name);
+            await item.setFlag("activity-macro", aid, {
+              macroId:      found?.id   ?? null,
+              macroName:    found?.name ?? null,
+              amactivityId: aid
+            });
+            ui.notifications.info(
+              game.i18n.localize("activity-macro.dataSaved")
+                .replace("{activityName}", activities.find(a => a.id === aid).name)
+            );
+          });
+        });
+      }
+    }),
+    { autoHeight: false }
+  );
+});
+
