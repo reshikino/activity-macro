@@ -62,7 +62,8 @@ This module is licensed under the MIT License. See [LICENSE](LICENSE) for more i
 
 ## Authors
 
-- **reshikino**  
+- **reshikino** 
   - GitHub: [reshikino](https://github.com/reshikino)  
   - Discord: [reshikino#5514](https://discord.com/users/reshikino#5514)
+  - Telegram: [reshikino](http://t.me/reshikino)
 
