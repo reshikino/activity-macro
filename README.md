@@ -54,7 +54,8 @@ When writing a macro to be executed with an activity, you will have access to th
 - `concentration`: The concentration config, in case you need the concentration ID for anything
 - `results`: An object with varied data that are a result of using the activity, such as created templates, or the chat message.
 
-
+## Compatibles
+   -Tidy5e Sheet v10.1.1 
 ## License
 
 This module is licensed under the MIT License. See [LICENSE](LICENSE) for more information.
